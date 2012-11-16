@@ -59,15 +59,23 @@ describe ChefGithubHook do
   end
   describe 'chef_repo_cmd' do
 
-    let (:command) { double Mixlib::ShellOut }
-  
+    before :each do
+      @command = double Mixlib::ShellOut
+      [:cwd=,:run_command,:error!,:stdout,:stderr].each do |method|
+        @command.stub(method)
+      end
+    end
     it 'should execute commands that are arguments' do
       argument = "knife cookbook upload *"
-      Mixlib::ShellOut.should_receive(:new).with(argument).and_return(command)
-      [:cwd,:run_command,:error!,:stdout,:stderr].each do |method|
-        command.should_receive(method)
-      end
+      Mixlib::ShellOut.should_receive(:new).with(argument).and_return(@command)
       ChefGithubHook.chef_repo_cmd(argument)
+    end
+    it 'should call Mixlib::ShellOut.cwd=' do
+      ENV["CHEF_REPO_DIR"] = '/tmp'
+      Mixlib::ShellOut.should_receive(:new).with('ls').and_return(@command)
+      @command.should_receive(:cwd=).with('/tmp')
+      @command.should_not_receive(:cwd)
+      ChefGithubHook.chef_repo_cmd('ls')
     end
   end
 
