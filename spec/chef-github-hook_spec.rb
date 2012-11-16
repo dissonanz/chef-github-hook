@@ -45,5 +45,29 @@ describe ChefGithubHook do
         "after" => "de8251ff97ee194a289832576287d6f8ad74e3d0",
         "ref" => "refs/heads/master"
     }
+
+    #Setting up Sinatra application for testing
+    def app
+      ChefGithubHook::RestAPI
+    end
+
+    it "responds to posts on /" do
+      ChefGithubHook.stub(:sync_to)
+      post '/'
+      last_response.status.should_not == 404
+    end
+  end
+  describe 'chef_repo_cmd' do
+
+    let (:command) { double Mixlib::ShellOut }
+  
+    it 'should execute commands that are arguments' do
+      argument = "knife cookbook upload *"
+      Mixlib::ShellOut.should_receive(:new).with(argument).and_return(command)
+      [:cwd,:run_command,:error!,:stdout,:stderr].each do |method|
+        command.should_receive(method)
+      end
+      ChefGithubHook.chef_repo_cmd(argument)
+    end
   end
 end

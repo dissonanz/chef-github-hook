@@ -14,7 +14,7 @@ class ChefGithubHook
 
   class << self
     def chef_repo_cmd(cmd)
-      command = Mixlib::ShellOut.new("git checkout #{commit}")
+      command = Mixlib::ShellOut.new(cmd)
       command.cwd(ENV["CHEF_REPO_DIR"])
       command.run_command
       command.error!
