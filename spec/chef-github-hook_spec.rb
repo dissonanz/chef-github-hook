@@ -3,7 +3,7 @@ require 'rack/test'
 require 'yajl'
 
 describe ChefGithubHook do
-  describe RestAPI do
+  describe ChefGithubHook::RestAPI do
     include Rack::Test::Methods
     @hook_sample = {
       "before" => "5aef35982fb2d34e9d9d4502f6ede1072793222d",
