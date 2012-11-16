@@ -3,7 +3,7 @@ source "http://rubygems.org"
 gem "yajl-ruby"
 gem "sinatra"
 gem "vegas"
-gem "chef"
+gem "chef", ">= 0.8.14"
 gem "knife-essentials"
 gem "mixlib-shellout"
 
