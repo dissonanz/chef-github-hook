@@ -70,4 +70,50 @@ describe ChefGithubHook do
       ChefGithubHook.chef_repo_cmd(argument)
     end
   end
+
+  describe 'parse_knife_diff_output' do
+    context 'no input' do
+      let (:parser) { ChefGithubHook.parse_knife_diff_output("") }
+      it 'should return a hash' do
+        parser.class.should == Hash
+      end
+      it 'should return a hash with specified keys' do
+        %w(cookbook role environment data_bag).each do |item|
+          parser.should have_key "#{item}_delete".to_sym
+        end
+      end
+    end
+    context 'has input' do
+      input = '''
+D cookbooks/book1/recipes/default.rb
+D cookbooks/book2
+D roles/role1.json
+D roles/role2.rb
+D roles/role3
+D environments/env1.json
+D data_bags/bag1
+D data_bags/bag2/item1.json
+      '''
+      let (:parser) { ChefGithubHook.parse_knife_diff_output(input)}
+      it 'should not list filenames within cookbooks' do
+        parser[:cookbook_delete].should == ['book2']
+      end
+      it 'should list deleted data bags' do
+        parser[:data_bag_delete].should include 'bag1'
+      end
+      it 'should not list entire data bags when only items are deleted' do
+        parser[:data_bag_delete].should_not include 'bag2'
+      end
+      it 'should include deleted data bag items' do
+        parser[:data_bag_delete].should include 'bag2 item1'
+      end
+      it 'should include deleted roles when they have an extension' do
+        parser[:role_delete].should include 'role1','role2'
+        parser[:role_delete].should_not include 'role3'
+      end
+      it 'should include deleted environments' do
+        parser[:environment_delete].should include 'env1'
+      end
+    end
+  end
 end

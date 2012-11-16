@@ -29,8 +29,8 @@ class ChefGithubHook
         :data_bag_delete => []
       }
       output.each_line do |line|
-        case line
-        when /^D\s+cookbooks\/(.+)$/
+        case line.strip!
+        when /^D\s+cookbooks\/([^\/]+)$/
           pending[:cookbook_delete] << $1
         when /^D\s+environments\/(.+)\.(json|rb)$/
           pending[:environment_delete] << $1
@@ -38,10 +38,11 @@ class ChefGithubHook
           pending[:data_bag_delete] << "#{$1} #{$2}"
         when /^D\s+data_bags\/(.+)$/
           pending[:data_bag_delete] << $1
-        when /^D\s+roles\/(.+)$/
+        when /^D\s+roles\/(.+)\.(json|rb)$/
           pending[:role_delete] << $1
         end
       end
+      pending
     end
 
     def sync_nodes
