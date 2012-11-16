@@ -20,4 +20,6 @@ group :development do
   gem "bundler"
   gem "jeweler", "~> 1.8.4"
   gem "rack-test"
+  gem "guard-rspec"
+  gem "rb-inotify"
 end
